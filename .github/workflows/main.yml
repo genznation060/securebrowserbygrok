@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -34,17 +34,14 @@ jobs:
         run: yes | sdkmanager --licenses || true
         working-directory: ${{ github.workspace }}
 
-      - name: Write local.properties
-        run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          ls -la "$ANDROID_HOME" || true
-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
       - name: Build Debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon --info
+        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon --warning-mode all
 
       - name: Build Kiosk APK
         run: ./gradlew :app:assembleKiosk --stacktrace --no-daemon
