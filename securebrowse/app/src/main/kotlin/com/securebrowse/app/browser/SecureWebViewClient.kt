@@ -85,7 +85,8 @@ class SecureWebViewClient(
 
     override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
         if (!request.isForMainFrame) return
-        if (error.errorCode == WebViewClient.ERROR_FAILED_SSL) return
+        // Correct constant name
+        if (error.errorCode == WebViewClient.ERROR_FAILED_SSL_HANDSHAKE) return
         callbacks.onError("This page failed to load.")
     }
 
