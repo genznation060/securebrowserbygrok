@@ -1,66 +1,61 @@
 name: Build SecureBrowse APK
 
 on:
-  push:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
+push:
+branches:
+- main
+- master
+workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-24.04
+build:
+runs-on: ubuntu-24.04
 
-    defaults:
-      run:
-        working-directory: securebrowse
+defaults:
+  run:
+    working-directory: securebrowse
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-      # v4 is deprecated per GitHub's runner warning; v5 is the current release
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+  - name: Set up JDK 17
+    uses: actions/setup-java@v5
+    with:
+      distribution: temurin
+      java-version: '17'
 
-      # CHANGED: platforms;android-36 -> platforms;android-37
-      # build-tools stays at 36.0.0 (does not need to match compileSdk)
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platform-tools platforms;android-37 build-tools;36.0.0'
+  - name: Setup Android SDK
+    uses: android-actions/setup-android@v3
+    with:
+      packages: 'platform-tools platforms;android-37.0 build-tools;36.0.0'
 
-      # Silenced output; still best-effort. setup-android already accepts licenses
-      # by default, so this step is optional but kept for safety.
-      - name: Accept Android SDK Licenses
-        run: yes | sdkmanager --licenses > /dev/null 2>&1 || true
-        working-directory: ${{ github.workspace }}
+  - name: Accept Android SDK Licenses
+    run: yes | sdkmanager --licenses > /dev/null 2>&1 || true
+    working-directory: ${{ github.workspace }}
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+  - name: Make gradlew executable
+    run: chmod +x ./gradlew
 
-      - name: Write local.properties
-        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+  - name: Write local.properties
+    run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
-      - name: Build Debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon --warning-mode all
+  - name: Build Debug APK
+    run: ./gradlew :app:assembleDebug --stacktrace --no-daemon --warning-mode all
 
-      - name: Build Kiosk APK
-        run: ./gradlew :app:assembleKiosk --stacktrace --no-daemon
+  - name: Build Kiosk APK
+    run: ./gradlew :app:assembleKiosk --stacktrace --no-daemon
 
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: securebrowse-debug-apk
-          path: securebrowse/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: warn
+  - name: Upload Debug APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: securebrowse-debug-apk
+      path: securebrowse/app/build/outputs/apk/debug/*.apk
+      if-no-files-found: warn
 
-      - name: Upload Kiosk APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: securebrowse-kiosk-apk
-          path: securebrowse/app/build/outputs/apk/kiosk/*.apk
-          if-no-files-found: warn
+  - name: Upload Kiosk APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: securebrowse-kiosk-apk
+      path: securebrowse/app/build/outputs/apk/kiosk/*.apk
+      if-no-files-found: warn
