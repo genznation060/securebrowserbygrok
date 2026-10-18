@@ -95,9 +95,8 @@ class PassphraseActivity : AppCompatActivity() {
     }
 
     private fun charsOf(field: android.widget.EditText): CharArray {
-        val value = CharArray(field.length())
-        field.text?.getChars(0, field.length(), value, 0)
-        return value
+        val text = field.text?.toString() ?: return CharArray(0)
+        return text.toCharArray()
     }
 
     private fun showError(message: String) {
