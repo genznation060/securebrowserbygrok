@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.securebrowse.app"
-    compileSdk = 37.0
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.securebrowse.app"
